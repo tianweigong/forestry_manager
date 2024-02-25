@@ -1,0 +1,286 @@
+---
+title: "analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Rmisc)
+library(dplyr)
+library(ggplot2)
+```
+
+
+```{r setup, include=FALSE}
+library(gridExtra)
+library(lmtest)
+library(rjson)
+library(reshape2)
+library(lmerTest)
+library(emmeans)
+```
+
+```{r}
+tr_total=16
+fr=32
+```
+
+
+```{r}
+load("dt.Rda")
+df.jud$causal=factor(df.jud$causal)
+```
+
+# demographic
+```{r}
+table(df.dmg$theGender)
+summarySE(df.dmg,measurevar = "theAge",na.rm = T)
+```
+
+
+```{r}
+pic.jud=df.jud%>%mutate(change=factor(change,levels = c("rigid","flex"),labels = c("Rigid","Non-rigid")),
+                       direct_c=factor(direct_c,levels=c("cau_dec","cau_inc"),labels = c("Decrease","Increase")),
+                       direct_e=factor(direct_e,levels=c("eff_dec","eff_inc"),labels = c("Decrease","Increase")),
+                       delay=factor(delay,levels=c("fast","slow"),labels = c("Short","Long")),
+                       bound=factor(bound,levels=c("middle","bound"),labels = c("Middle","Boundary")),
+                       causal=factor(causal,levels=c("neg","pos"),labels = c("Negative","Positive")))
+```
+
+```{r}
+contrasts(df.jud$delay)=contr.sum(2)
+contrasts(df.jud$bound)=contr.sum(2)
+contrasts(df.jud$direct_c)=contr.sum(2)
+contrasts(df.jud$direct_e)=contr.sum(2)
+contrasts(df.jud$change)=contr.sum(2)
+contrasts(df.jud$causal)=contr.sum(2)
+
+glmer(ans_bina~delay+(1+delay|id),family = "binomial",control = glmerControl(optimizer="bobyqa") ,df.jud)%>%summary()
+glmer(ans_bina~change+(1+change|id),family = "binomial",control = glmerControl(optimizer="bobyqa") ,df.jud)%>%summary()
+glmer(ans_bina~direct_c+(1+direct_c|id),family = "binomial",control = glmerControl(optimizer="bobyqa") ,df.jud)%>%summary()
+glmer(ans_bina~direct_e+(1+direct_e|id),family = "binomial",control = glmerControl(optimizer="bobyqa") ,df.jud)%>%summary()
+glmer(ans_bina~bound+(1+bound|id),family = "binomial",control = glmerControl(optimizer="bobyqa") ,df.jud)%>%summary()
+glmer(ans_bina~causal+(1+causal|id),family = "binomial",control = glmerControl(optimizer="bobyqa"),df.jud)%>%summary()
+```
+
+
+```{r}
+Myplot<-function(pic){
+  pic%>%summarySE(measurevar = "ans_bina",groupvars = "xvar")%>%
+    ggplot(aes(x=xvar ,y=ans_bina))+
+    geom_bar(stat="identity",position=position_dodge(.9),color="black",fill="#984EA3")+#EBEBEB
+    geom_errorbar(aes(ymin = ans_bina-ci,ymax = ans_bina+ci),width=0,position=position_dodge(.9))+
+    theme_bw()+
+    scale_y_continuous(limits = c(0,0.8),breaks = c(0,0.2,0.4,0.6))+
+    theme(text = element_text(size=15),
+        axis.title.x = element_text(size=15, face="bold"),    
+        axis.title.y = element_text(size=15, face="bold"), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+}
+
+pic.jud%>%mutate(xvar=delay)%>%
+  Myplot()+ylab("Accuracy")+xlab("Lag")
+
+# ggsave(file="acc_Lag.pdf",width =2.8,height = 2.8)
+
+pic.jud%>%mutate(xvar=direct_c)%>%
+  Myplot()+ylab("Accuracy")+xlab("DirectionX")+
+  theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="acc_DirectionX.pdf",width =2.8,height = 2.8)
+
+pic.jud%>%mutate(xvar=direct_e)%>%
+  Myplot()+ylab("Accuracy")+xlab("DirectionY")+
+  theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="acc_DirectionY.pdf",width =2.8,height = 2.8)
+
+pic.jud%>%mutate(xvar=change)%>%
+  Myplot()+ylab("Accuracy")+xlab("Rigidity")+
+  theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="acc_Rigidity.pdf",width =2.8,height = 2.8)
+
+pic.jud%>%mutate(xvar=causal)%>%
+  Myplot()+ylab("Accuracy")+xlab("Slope")+
+  theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="acc_Causation.pdf",width =2.8,height = 2.8)
+
+pic.jud%>%mutate(xvar=bound)%>%
+  Myplot()+ylab("Accuracy")+xlab("RangeY")+
+  theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="acc_RangeY.pdf",width =2.8,height = 2.8)
+  
+```
+
+
+```{r}
+#bound*direct_c*direct_e
+glmer(ans_bina~bound*direct_c*direct_e
+      +(1+bound*direct_c*direct_e|id),family = "binomial",control = glmerControl(optimizer="bobyqa"),df.jud) %>% summary()
+```
+
+```{r}
+pic.jud%>%
+  summarySE(measurevar = "ans_bina",groupvars = c("direct_e","direct_c","bound"))%>%
+  mutate(direct_c=factor(direct_c,levels = c("Decrease","Increase"),labels = c("DirectionX: Decrease","DirectionX: Increase")))%>%
+  ggplot(aes(x=direct_e ,y=ans_bina,fill=bound ))+
+  facet_wrap(~direct_c)+
+  geom_bar(stat="identity",position=position_dodge(.9),color="black")+
+  scale_fill_manual(name="RangeY",values = c("#FDBF6F","#377EB8"))+ #"#EBEBEB","#A9A9A9"
+  geom_errorbar(aes(ymin = ans_bina-ci,ymax = ans_bina+ci),width=0,position=position_dodge(.9))+
+  theme_bw()+
+  xlab("DirectionY")+
+  ylab("Accuracy")+
+  # scale_y_continuous(limits = c(0,0.8),breaks = c(0,0.2,0.4,0.6))+
+  theme(text = element_text(size=10),
+      axis.title.x = element_text(size=10, face="bold"),    
+      axis.title.y = element_text(size=10, face="bold"), 
+      panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+      legend.position = "top",
+      legend.margin =margin(r=0,l=0,t=0,b=-5),
+      strip.background = element_rect(fill="white"),
+       legend.text = element_text(size = 8)
+      )
+
+# ggsave(file="f_quantity.pdf",width =5,height = 2.8)
+```
+
+```{r}
+#delay*change
+glmer(ans_bina~delay*change
+        +(1+delay*change|id),family = "binomial",control = glmerControl(optimizer="bobyqa"),df.jud) %>%summary()
+
+m=glmer(ans_bina~delay*change
+        +(1+delay*change|id),family = "binomial",control = glmerControl(optimizer="bobyqa"),df.jud)
+```
+
+
+```{r}
+m=glmer(ans_bina~delay*change*direct_e +
+        (1+delay*change*direct_e|id) ,control = glmerControl(optimizer="bobyqa"),family = "binomial",df.jud)
+
+m%>%summary()
+summ(m)
+```
+
+```{r}
+m=glmer(ans_bina~delay*change*direct_c +
+        (1+delay*change*direct_c|id) ,control = glmerControl(optimizer="bobyqa"),family = "binomial",df.jud)
+
+m%>%summary()
+summ(m)
+```
+
+```{r}
+m=glmer(ans_bina~delay*change*bound +
+        (1+delay*change*bound|id) ,control = glmerControl(optimizer="bobyqa"),family = "binomial",df.jud)
+m%>%summary()
+summ(m)
+```
+
+
+
+```{r}
+#delay*change*direct_c*direct_e
+m=glmer(ans_bina~delay*change*direct_c*direct_e+
+        (0+delay*change*direct_c*direct_e|id) ,family = "binomial",df.jud)
+#,control = glmerControl(optimizer="bobyqa")
+m%>%summary()
+summ(m)
+```
+
+
+```{r}
+# pic.jud%>%
+#   summarySE(measurevar = "ans_bina",groupvars = c("direct_e","direct_c","delay","change"))%>%
+#   mutate(direct_c=factor(direct_c,levels = c("Decrease","Increase"),labels = c("DirectionX: Decrease","DirectionX: Increase")),
+#          direct_e=factor(direct_e,levels = c("Decrease","Increase"),labels = c("DirectionY: Decrease","DirectionY: Increase"))
+#          )%>%
+#   ggplot(aes(x=delay ,y=ans_bina,fill=change))+
+#   facet_grid(vars(direct_e),vars(direct_c))+
+#   geom_bar(stat="identity",position=position_dodge(.9),color="black")+
+#   scale_fill_manual(name="RangeY",values = c("#FDBF6F","#377EB8"))+ #"#EBEBEB","#A9A9A9"
+#   geom_errorbar(aes(ymin = ans_bina-ci,ymax = ans_bina+ci),width=0,position=position_dodge(.9))+
+#   theme_bw()+
+#   xlab("Lag")+
+#   ylab("Accuracy")+
+#   # scale_y_continuous(limits = c(0,0.8),breaks = c(0,0.2,0.4,0.6))+
+#   theme(text = element_text(size=10),
+#       axis.title.x = element_text(size=10, face="bold"),    
+#       axis.title.y = element_text(size=10, face="bold"), 
+#       panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+#       legend.position = "top",
+#       legend.margin =margin(r=0,l=0,t=0,b=-5),
+#       strip.background = element_rect(fill="white"),
+#        legend.text = element_text(size = 8)
+#       )
+# 
+# # ggsave(file="f_dynamics.pdf",width =5,height = 3.8)
+```
+
+
+# Choice frequency
+```{r}
+#write.csv(df.jud,file="dt.csv")
+#multinomial regressions were done using Jamovi 
+```
+
+
+```{r}
+MyPlot<-function(d){
+  d%>%
+  mutate(answer=factor(answer,levels = c("pos","ind","neg")))%>%
+  ggplot(aes(x=xvar,fill=answer))+
+  geom_bar(position = "fill",color="black",size=0.2,width=0.5)+
+  scale_fill_manual("Choice",values=c("#FDBF6F","#A65628","#8b8b8b"),labels=c("Positive (Regular)","No Relationship","Negative (Inverse)"))+#"#EBEBEB","#A9A9A9","#c6c6c6"
+  theme_bw()+
+  ylab("Proportion")+
+  theme(text = element_text(size=14),
+        axis.title.x = element_text(size=14, face="bold"),    
+        axis.title.y = element_text(size=14, face="bold"), 
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        legend.position = "right"
+        )
+}
+
+pic.jud%>%mutate(xvar=delay)%>%
+  MyPlot()+
+  xlab("Lag")
+
+# ggsave(file="freq_Lag.pdf",width =4.5,height = 2.8)
+
+pic.jud%>%mutate(xvar=change)%>%
+  MyPlot()+
+  xlab("Rigidity")+theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="freq_Rigidity.pdf",width =4.5,height = 2.8)
+
+pic.jud%>%mutate(xvar=direct_c)%>%
+  MyPlot()+
+  xlab("DirectionX")+theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="freq_DirectionX.pdf",width =4.5,height = 2.8)
+  
+pic.jud%>%mutate(xvar=direct_e)%>%
+  MyPlot()+
+  xlab("DirectionY")+theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="freq_DirectionY.pdf",width =4.5,height = 2.8)
+
+pic.jud%>%mutate(xvar=bound)%>%
+  MyPlot()+
+  xlab("RangeY")+theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="freq_RangeY.pdf",width =4.5,height = 2.8)
+
+pic.jud%>%mutate(xvar=causal)%>%
+  MyPlot()+
+  xlab("Slope")+theme((axis.ticks.y = element_blank()))
+
+# ggsave(file="freq_Causation.pdf",width =4.5,height = 2.8)
+```
+
+

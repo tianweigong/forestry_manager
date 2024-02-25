@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="static/lib/jquery.min.js"></script>
+	<script src="static/js/main.js" charset="utf-8"></script>
+	<script src="static/js/param.js" charset="utf-8"></script>
+	<link href="static/lib/bootstrap.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" href="static/css/styles.css">
+	<title>Forestry Manager</title>
+</head>
+<body><!-- oncontextmenu="return false" -->
+	<div id="pg_cons" class="ctn_nbg">
+		<!-- <div style="text-align: center;padding-top: 10px;"><img src="static/img/uni_logo.png" style="width:200px"></div> -->
+		<h1>Information Sheet for Participants</h1>
+		<iframe src="static/page/consent.html" style="border:0px;width: 100%;height: 400px;"></iframe>
+		<div align="center">
+		<br>
+    	<button id="btn_cons" class="btn-primary btn-lg" onclick="idpro_show()">Consent and Continue</button>
+		</div> <br>
+	</div>
+	<div id="pg_oops" class="ctn" style="padding: 20px; display: none;">
+		<h1>Oops!</h1>
+		<p>Sorry, you appear to have participated in this or a very similar task before! Unfortunately, this means you will not be able to participate in this one. Please return the task so someone else can do it.</p>
+	</div>
+	<div id="pg_oops2" class="ctn" style="padding: 20px; display: none;">
+		<h1>Oops!</h1>
+		<p>Sorry, it fails to connect to the database under your network, which means we might not be able to receive you data (there could be many reasons including our database or the interaction between your network and the database). Please return the task or reload the page later. Thank you very much!!</p>
+	</div>
+
+	<div id="pg_idpro" class="ctn_nbg" style="display: none;"><!-- style="display: none;" -->
+		<h1>Instructions</h1>
+		<div class="ctn" style="padding: 20px;">
+			<p>Please enter your Prolific ID here (you can enter anything for this demo)</p>
+			<p><input type="text" name="idpro" id="idpro" style="width: 400px;" oninput="idpro_check()"></p>
+		</div>
+		<br>
+		<div align="center">
+    	<button id="btn_idpro" class="btn-primary btn-lg" disabled="true" onclick="ins_show()">Continue</button>
+    	</div>
+	</div>
+
+	<div id="pg_ins" class="ctn_nbg" style="display: none;"><!-- style="display: none;" -->
+		<h1>Instructions</h1>
+		<div id="pg_ins1" class="ctn" style="padding: 20px;">
+			<p>Thank you for participating in this study!</p>
+			<p>Please read the instructions very carefully! You will have to pass a test on your understanding before you can start the experiment.</p>
+			<p><b> Please do not change the zoom level during the experiment. The experiment may only work properly if you have your browser zoom level on 100% throughout.</b> (You can change the zoom level to 100% by pressing "cmd+zero" on a mac or "ctrl+zero" on a PC.)</p>
+			<p>Please do not refresh this page during the experiment.</p>
+		</div>
+		<div id="pg_ins2" class="ctn" style="padding: 20px; display: none;">
+			<p>In this study, you will play the role of "forestry manager". There are various kinds of plants growing in the forest. Your task is to find out if there is a causal relationship between particular pairs of plants (e.g. some Plant A and Plant B), To do this, you will observe how the number of both types of plant varies over time.</p>
+
+			<br>
+
+			<div style="text-align: center"><img src="static/img/lily.jpg" style="width:400px"></div>
+			
+			<br>
+
+			<p>The quantity of Plant A, is always controlled by the forestry commision.</p>
+
+			<p>However quantity of Plant B is not controlled by the forestry commission.  Plant B might or might not be influenced by the quantity of Plant A and this influence could also be either positive or negative.</p>
+
+
+
+			<div style="text-align: center"><img src="static/img/demo.jpg" style="width:600px"><br>(how the number of a type of plant varies over time)</div>
+			<br>
+
+
+			<p>If Plant A and B have a <b>positive (regular)</b> relationship, we would expect that:</p>
+
+			<p>* If the quantity of Plant A increases, it will cause an increase in the quantity of Plant B,</p>
+			<p>* OR equally if the quantity of Plant A decreases, it will cause a decrease in the quantity of  Plant B.</p>
+
+			<br>
+
+
+			<p>If Plant A and B have a <b>negative (inverse)</b> relationship, we would expect that:</p>
+
+			<p>* If the quantity of Plant A increases, it will cause a decrease in the quantity of Plant B,</p>
+			<p>* OR equally if the quantity of Plant A decreases, it will cause an increase in the quantity of Plant B.</p>
+
+			<br>
+
+			<p>If Plant A has no causal influence on Plant B we would expect increases or decreases in Plant A to have no relationship with any increases or decreases in Plant B.</p>
+
+			<p>Importantly, in order to figure out the relationship, you have to think through both A and B. It is impossible to tell the relationship by focusing on just one kind of plants. For example, if the number of Plant B decreases, the relationship could be positive (regular), negative (inverse), or indifferent. It should further depend on whether A increases or decreases.</p>
+		</div>
+
+		<div id="pg_ins3" class="ctn" style="padding: 20px; display: none;">
+			<p>Here is a video example of how the quantities of a kind of plant might vary over time:</p>
+
+			<div align="center">
+			<video controls="" height="200" id="demo_video" name="demo_video" muted="" preload="auto">
+                <source src="./static/img/demo.mp4" type="video/mp4">
+                <p>Sorry.  If this video wont play you won't be able to complete the experiment.</p>
+            </video>
+            <img src="static/img/sci.png" style="width:70px">
+        	</div>
+			
+			<br>
+			<p>For this task, the locations, colors, and shapes of plants are irrelevant. To be a good forestry manager, you only need to focus on the QUANTITY of each plant.</p>
+
+			<p>You will observe16 completely different pairs of plants. In each case, Plant A is controlled by the forestry commission and you just have to judge whether Plant A has:</p> 
+
+			<p>(1) A positive (regular) causal influence on Plant B OR </p>
+			<p>(2) a negative (inverse) causal influence no Plant B OR </p>
+			<p>(3) no casual relationship with Plant B</p>
+
+			<p>Do not worry if the task feels difficult at first. We are curious about people's intuitions in making causal judgments so just give your best guess &#128077</p>
+			
+		</div>
+		
+		<div id="pg_ins4" class="ctn" style="padding: 20px; display: none;">
+			<p> Comprehension check: To make sure you understand the instructions, now please indicate whether each of the following statements is true or false.</p>
+
+			<form>
+				<p>"Your job is to work out if Plant A has a positive (regular), a negative (inverse), or no causal influence on Plant B for each pair of two plants."</p>
+				<input type="radio" name="check1" value="yes" id="check1_yes" required="required" onclick="click_comprehension()"><label for="check1_yes">True</label><br><input type="radio" name="check1" value="no" id="check1_no" required="required" onclick="click_comprehension()"><label for="check1_no">False</label><br><br>
+
+				<p>"If Plant A and Plant B have a positive (regular) relationship, you might see --" (select all possible patterns)</p>
+				<input type="checkbox" id="check5_ID" name="check5_ID" value="ID" onclick="click_comprehension()">
+				<label for="check5_ID"> An increase in the quantity of Plant A causes a decrease in the quantity of Plant B</label><br>
+				<input type="checkbox" id="check5_II" name="check5_II" value="II" onclick="click_comprehension()">
+				<label for="check5_II"> An increase in the quantity Plant A causes an increase in the quantity of Plant B</label><br>
+				<input type="checkbox" id="check5_DI" name="check5_DI" value="DI" onclick="click_comprehension()">
+				<label for="check5_DI"> A decrease in the quantity of plant A causes an increase in the quantity of Plant B</label><br>
+				<input type="checkbox" id="check5_DD" name="check5_DD" value="DD" onclick="click_comprehension()">
+				<label for="check5_DD"> A decrease in the quantity of Plant A causes a decrease in the quantity of Plant B</label><br><br>
+
+				<p>"If Plant A and Plant B have a negative (inverse) relationship, you might see --" (select all possible patterns)</p>
+				<input type="checkbox" id="check6_II" name="check6_II" value="II" onclick="click_comprehension()">
+				<label for="check6_II"> An increase in the quantity Plant A causes an increase in the quantity of Plant B</label><br>
+				<input type="checkbox" id="check6_ID" name="check6_ID" value="ID" onclick="click_comprehension()">
+				<label for="check6_ID"> An increase in the quantity of Plant A causes a decrease in the quantity of Plant B</label><br>
+				<input type="checkbox" id="check6_DI" name="check6_DI" value="DI" onclick="click_comprehension()">
+				<label for="check6_DI"> A decrease in the quantity of plant A causes an increase in the quantity of Plant B</label><br>
+				<input type="checkbox" id="check6_DD" name="check6_DD" value="DD" onclick="click_comprehension()">
+				<label for="check6_DD"> A decrease in the quantity of Plant A causes a decrease in the quantity of Plant B</label><br><br>
+
+				<p>"When the quantity of Plant B decreases, if the quantity of Plant A has decreased, it means there is a positive relationship between A and B."</p>
+				<input type="radio" name="check2" value="yes" id="check2_yes" required="required" onclick="click_comprehension()"><label for="check2_yes">True</label><br><input type="radio" name="check2" value="no" id="check2_no" required="required" onclick="click_comprehension()"><label for="check2_no">False</label><br><br>
+
+				<p>"The exact position of the  plants in the scene is relevant to the relationship between the plants."</p>
+				<input type="radio" name="check3" value="yes" id="check3_yes" required="required" onclick="click_comprehension()"><label for="check3_yes">True</label><br><input type="radio" name="check3" value="no" id="check3_no" required="required" onclick="click_comprehension()"><label for="check3_no">False</label><br><br>
+
+				<p>"The color or the shape of plants could be relevant to the relationship between the plants."</p>
+				<input type="radio" name="check4" value="yes" id="check4_yes" required="required" onclick="click_comprehension()"><label for="check4_yes">True</label><br><input type="radio" name="check4" value="no" id="check4_no" required="required" onclick="click_comprehension()"><label for="check4_no">False</label><br><br>
+			</form>
+			
+		</div>
+
+		<div id="pg_nice" class="ctn" style="padding: 20px; display: none;">
+		<p>Well done, you got all the questions correct!</p>
+		<p>You are now ready to start the task!</p>
+		</div>
+
+		<div id="pg_again" class="ctn" style="padding: 20px; display: none;">
+		<p>Unfortunately, you didn't answer all of the comprehension check questions correctly.</p>
+		<p>Please have another close look at the instructions and work out whether those statements are correct or false.</p>
+		</div>
+
+		<br>
+		<div>
+			<button type="button" class="btn-primary btn-lg"  id="btn_backward" onclick="ins_prev()">Previous</button>
+			&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+			<button type="button" class="btn-primary btn-lg"  id="btn_forward" onclick="ins_next()">Next</button>
+		</div>
+		<br><br><br>
+	</div>
+
+	<div id="pg_game" style="display: none;">
+	<h1>Task</h1>
+	<div class="prog_ctn">Progress: 
+		<div style="width:900px;height:10px;background: #bab0b0;">
+			<div id="progress_indicator" style="width:0px;height:10px;background: #ED8D8D;"></div>
+		</div>
+	</div>
+	<div id="hint_container" class="ctn" style="padding:10px 10px 10px 20px; color:#393232;">
+		* Observe the quantities of two plants over time. <br>
+		* Judge whether Plant A influences Plant B positively, negatively, or not at all. <br>
+		<div style="height:10px"></div>
+		* A positive (regular) relationship is one in which A's increase causes B to increase, and A's decreasing to cause B to decrease.<br>
+		* A negative (inverse) relationship is one in which we expect A's increase to cause B to decrease, and A's decreasing to cause B to increase.<br>
+		<div style="height:10px"></div>
+		* You are welcome to take a break between each plant pair. Only click "Observe" when you are ready to start the next task. Each video can only be played once.
+	</div>
+
+	<div id="sti_container" class="ctn" style="height: 500px;padding-top:5px">
+	<div style="width:800px;margin-right: auto; margin-left: auto; padding-bottom: 40px;color:#393232;">
+		<div style="font-size: 24px;width: 354px;text-align:center;float: left;">Plant A</div>
+		<div style="font-size: 24px;width: 354px;text-align:center;float: right;">Plant B</div>
+	</div>
+	<div style="width:800px;margin-right: auto; margin-left: auto;">
+		<div id="node_left" class="node_x" style="margin-left: 0;float: left;clear: both;"></div>
+		<div id="node_right" class="node" style="margin-right: 0;float: right;"></div>
+		<div id="hint_arrow" style="position: absolute;margin-left: 320px;margin-top: 80px;"><!-- 358px -->
+			<img src="static/img/arrow.png" width="90px">
+		</div>
+
+	</div>
+	<div style="clear: both;"></div>
+	<div id="question_ctn" class="noselect" style="padding:10px;color:#dcd7d7;width:800px;margin-right:auto;margin-left:auto;">
+			<div style="width:800px;text-align: center;">What is the relationship between Plant A and Plant B?<br>
+			</div>
+			<div style="margin-left: auto; margin-right: auto; width: 700px;padding-bottom:20px;padding-top:10px">
+			<div id="choice_left" style="float:left;"></div>
+			<div id="choice_middle" style="float:left;"></div>
+			<div id="choice_right" style="float:left;"></div></div>
+	</div>
+	</div>
+	
+	<br>
+	<div align="center" style="clear:both;">
+		<button id="btn_test" class="btn-primary btn-lg" onclick="btn_next_click()">Observe (when you are ready)</button>
+	</div>
+
+	<br><br><br>
+	</div>
+
+	<div id="pg_ques" class="ctn_nbg" style="display: none;">
+		<h1>Demographic Information</h1>
+
+		<div class="ctn" style="padding: 20px;">
+		<p>How did you work out the relationship between plants? What did you find particularly easy/hard? Did you have a strategy, if so what was it? Did you spot any bugs or errors?</p>
+		<textarea id='text_feedback' rows="4" cols="60"></textarea>
+		<p><b>Please answer the following questions about yourself to complete the experiment:</b></p>
+		<p>1. Age <span style="color: red">*</span>: <input type="number" name="age" id="age" oninput="survey_check()"> years</p>
+		<p>2. Gender <span style="color: red">*</span>: 
+			<select name="gender" id="gender" onchange="survey_check()">
+					<option id="gender_unselected" value="--" SELECTED>
+	                <option value="female">Female</option>
+	                <option value="male">Male</option>
+	                <option value="nonbinary">non binary</option>
+	                <option value="noresponse">I'd prefer not to respond</option>
+	        </select>
+		</p><br>
+		</div>
+		<br>
+		<div align="center">
+            <button id="btn_finish" disabled ="true" class="btn-primary btn-lg" onclick="task_bye()">Finish</button>
+        </div><br>
+	</div>
+
+	<div id="pg_bye" class="ctn_nbg" style="display: none;">
+		<p>Thank you very much! Bye bye.</p>
+<!-- 		<h1 id="well_done">Data uploading...</h1>
+		<div id="pg_bye_good" class="ctn" style="padding: 20px;display: none;">
+			<p>Thank you very much!! Data have been saved.
+			<p>Click <a href='https://app.prolific.co/submissions/complete?cc=7BC66F5F'>here</a> to redirect to Prolific."</p>
+		</div> 
+		<div id="pg_upload" class="ctn" style="padding: 20px;display: none;">
+			<p>Sorry, it seems that your network cannot connect to our database successfully. You need to upload the data manually.</p>
+
+			<p><b>Step 1:</b></p>
+			<p>Click <a href="javascript:void(0)" onclick='SaveData(0)'>here</a> to save your data (Inference.json) to your computer (you might need to wait a few seconds after clicking).</p>
+
+			<p><i>(Json is a common and safe file type developed under web languages. It is used to save data just like txt,csv. It can help us to merge your data with other participants later easily.)</i></p>
+
+			<p><b>Step 2:</b></p>
+			<p>Upload the file via <a href="https://forms.gle/UBfAgqV4xfvqJGiu6" target="_blank">this goolge form</a>.</p>
+
+			<p>If you prefer not to sign in a google account, you can also email the file directly to <b>gongtiw@gmail.com</b></p>
+			<br><br>
+			<button id="btn_upload" class="btn-primary btn-lg" disabled ="true" onclick="finish_upload()"><b>I have uploaded (or emailed) the data.</b></button>
+			</div>  -->
+
+	</div>
+
+</body>
+</html>
